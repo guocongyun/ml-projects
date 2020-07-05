@@ -57,7 +57,7 @@ class Dataset:
         slope = (y1-y0)/(x1-x0)
         constant = y0 - slope * x0
         self.target_function = [constant,slope, -1]
-        return self.target_function
+        return np.array(self.target_function)
 
     def rand_point(self,n):
         return np.random.uniform(-1,1,size=n)
