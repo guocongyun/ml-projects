@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 RUNS = 1000
-TRAIN_DATA_NUM = 1000
+TRAIN_DATA_NUM = 10
 TEST_DATA_NUM = 1000
 
 # IMPORTANT target_function = [constant, slope, -1]
@@ -26,13 +26,15 @@ TEST_DATA_NUM = 1000
 class Dataset:
 
     def __init__(self):
-        self.X, self.Y = None, None
+        self.X = None
+        self.Y = None
+        self.target_function = None
 
     def generate_data(self, target_function, classify=True, n=10):
 
         self.X, self.Y  = [], []
         
-        for _ in range(n):
+        for _ in range(n): # don't use np append in a loop as it's slow
 
             x1 , x2 = self.rand_point(2)
             x = np.array([1, x1, x2])
@@ -40,11 +42,12 @@ class Dataset:
             self.X.append(x)
             self.Y.append(y)
 
+        self.X, self.Y = np.array(self.X), np.array(self.Y)
         return self.X, self.Y
 
     def classification(self, x, target_function, classify):
-        if classify: return np.sign(np.dot(x,target_function))
-        else: return np.dot(x,target_function)
+        if classify: return int(np.sign(np.transpose(x) @ target_function)) # matmul automaticlly traspose the multiplication, i.e. X.T @ Y == np.malmut(X,Y)
+        else: return int(np.matmul(np.transpose(x) @ target_function))
 
         # return 1 if x[0] * slope + constant > x[1] else -1 
         # IMPORTANT target function is a line, and you classify the points based on if they are on the line or not 
@@ -53,7 +56,8 @@ class Dataset:
         x0, y0, x1, y1 = self.rand_point(4)
         slope = (y1-y0)/(x1-x0)
         constant = y0 - slope * x0
-        return [constant,slope, -1]
+        self.target_function = [constant,slope, -1]
+        return self.target_function
 
     def rand_point(self,n):
         return np.random.uniform(-1,1,size=n)
@@ -61,23 +65,26 @@ class Dataset:
 
 class Perceptron:
 
-    def __init__(self):
+    def __init__(self, weights = None):
         self.weights = None
-        self.target_function = None
 
     def create_weights(self):
         self.weights = np.zeros(3) # default type int
 
     def predict(self, point):
-        return np.sign(np.dot(self.weights, np.array(point)))
+        return np.sign(np.transpose(self.weights) @ point)
         
     def training(self, iteration_total, dataset): # train the perceptron
-        self.target_function = dataset.create_target_function()
-        X, Y = dataset.generate_data(self.target_function, TRAIN_DATA_NUM)
-        self.create_weights()
-
+        if (dataset.target_function == None): dataset.create_target_function()
+        X, Y = dataset.generate_data(dataset.target_function, TRAIN_DATA_NUM)
+        
+        # self.create_weights()
+        # feeding weights from linear regression into preceptron
+        
+        linear_regression = LinearRegression()
+        self.weights = linear_regression.training(dataset)
         while True:
-            self.plot(dataset)
+            # self.plot(dataset)
             misclassified = []
             for x, classification in zip(X , Y):
                 prediction = self.predict(x)
@@ -86,35 +93,41 @@ class Perceptron:
             
             if misclassified:
                 x, classification = misclassified[np.random.choice(len(misclassified))] # random.choice doesn't pop the item
-                self.weights = self.weights + x * classification               
+                # IMPORTANT 
+                # x * classification = np.dot(x, classification)
+                # The default dtpye of np array is float
+                # matmul or @ doesn't support sclar multiplication,i.e. 1*matrix
+                # classification * x doesn't work unless both are array or list
+
+                self.weights = self.weights + classification * x 
                 iteration_total += 1 # iteration num means the num of changes
 
-
             else: break # the perceptron converges when miclassified == 0 which breaks the loop
-        
+    
         return iteration_total
 
     def testing(self, error_total, dataset): # test the perceptron
-        X, Y = dataset.generate_data(self.target_function, TEST_DATA_NUM)
+        X, Y = dataset.generate_data(dataset.target_function, TEST_DATA_NUM)
         y_values = Y
-        y_hypothesis = np.sign(np.dot(X, self.weights))
+
+        y_hypothesis = np.sign(self.weights @ np.transpose(X))
         ratio_mismatch = ((y_values != y_hypothesis).sum())/TEST_DATA_NUM
         error_total += ratio_mismatch
 
         return error_total
 
     def plot(self, dataset):
-        print(self.target_function)
-        print(self.weights)
+        # print(self.target_function)
+        # print(self.weights)
         cs = ["red" if y > 0 else "blue" for y in dataset.Y]
         plt.scatter([x[1] for x in dataset.X], [x[2] for x in dataset.X], c=cs)
         y_left = (self.weights[1] - self.weights[0]) / self.weights[2]
         y_right = (-self.weights[1] - self.weights[0]) / self.weights[2]
         plt.plot((-1,1),(y_left, y_right), color="red")
 
-        actual_y_left = + self.target_function[0] - self.target_function[1]
-        actual_y_right = self.target_function[0] + self.target_function[1]
-        print(actual_y_left,actual_y_right)
+        actual_y_left = + dataset.target_function[0] - dataset.target_function[1]
+        actual_y_right = dataset.target_function[0] + dataset.target_function[1]
+        # print(actual_y_left,actual_y_right)
         plt.plot((-1,1),(actual_y_left, actual_y_right), color="green")
 
 
@@ -140,47 +153,70 @@ class LinearRegression():
         self.weight = None
     
     def training(self, dataset): # minimising Error in, Ein
-        target_function = dataset.create_target_function()
-        dataset.generate_data(target_function, False)
-        peusdo_inverse = np.linalg.pinv(dataset.X)
-        return peusdo_inverse
+        if (dataset.target_function == None): dataset.create_target_function()
+        dataset.generate_data(dataset.target_function, True, TRAIN_DATA_NUM)
+        transpose_X = np.transpose(dataset.X)
+        inverse_XTX = np.linalg.pinv(transpose_X @ dataset.X)
+        peusdo_inverse = inverse_XTX @ transpose_X
+        self.weight = peusdo_inverse @ dataset.Y
 
-    def testing(self, error_total, dataset): # Calculating Error in, Ein and Error out, Eo
         # print(dataset.X)
-        # print(self.weight)
+        # print(inverse_XTX)
+        # print(peusdo_inverse)
         # print(dataset.Y)
-        # print(np.transpose(dataset.X @ self.weight - dataset.Y))
-        # print((dataset.X @ self.weight - dataset.Y))
+        # print(target_function)
+        # print(peusdo_inverse @ dataset.Y)
+        # print(np.dot(peusdo_inverse, dataset.Y))
+        # exit()
+        return self.weight
 
-        square_error = np.dot(np.transpose(dataset.X @ self.weight - dataset.Y), (dataset.X @ self.weight - dataset.Y)) # not really square error
-        error_insample = 1/TRAIN_DATA_NUM * square_error
-        error_total += error_insample
+    def testing(self, error_total, dataset, insample = True): # Calculating Error in, Ein and Error out, Eo
+
+        # Generate new data if testing outsample error
+        if (not insample): dataset.generate_data(dataset.target_function, True, TEST_DATA_NUM)
+
+        # testing using square error
+        # square_error = np.dot(np.transpose(dataset.X @ self.weight - dataset.Y), (dataset.X @ self.weight - dataset.Y)) # not really square error
+        # square_error = 1/TRAIN_DATA_NUM * square_error # @ means matrix multiplication
+        # error_total += square_error
+
+        prediction = np.sign(dataset.X @ self.weight) # the position in dot or @ product matters
+        actual_value = np.array(dataset.Y)
+        # print(prediction)
+        # print(actual_value)
+        if (not insample): classification_error = sum(prediction != actual_value)/TEST_DATA_NUM
+        elif(insample): classification_error = sum(prediction != actual_value)/TRAIN_DATA_NUM
+        error_total += classification_error
         return error_total
 
     def main(self):
-        error_total = 0
+        error_insample_total = 0
+        error_outsample_total = 0
         dataset_ = Dataset() # IMPORTANT dataset = dataset() will cause referenced before assignment error
 
         for _ in range(RUNS):
-            peusdo_inverse = self.training(dataset_)
-            self.weight = np.dot(peusdo_inverse, dataset_.Y)
-            error_total = self.testing(error_total, dataset_)
-        return error_total
+            _ = self.training(dataset_)
+            error_insample_total = self.testing(error_insample_total, dataset_, True)
+            error_outsample_total = self.testing(error_insample_total, dataset_, False)
+
+        return error_insample_total,error_outsample_total, self.weight
 
 
 if __name__ == "__main__":
-    # perceptron = Perceptron()
-    # iteration_total, error_total = perceptron.main()
-
-    # iterations_avg = iteration_total / RUNS
-    # print("\nAverage number of PLA iterations over", RUNS, "runs: t_avg = ", iterations_avg)
-
-    # error_avg = error_total / RUNS
-    # print("\nAverage ratio for the mismatch between f(x) and h(x) outside of the training data:")
-    # print("P(f(x)!=h(x)) = ", error_avg)
-
-    linear_regression = LinearRegression()
-    error_total = linear_regression.main()
+    # IMPORTANT:  This is the main for perceptron
+    perceptron = Perceptron()
+    iteration_total, error_total = perceptron.main()
+    iterations_avg = iteration_total / RUNS
+    print("\nAverage number of PLA iterations over", RUNS, "runs: t_avg = ", iterations_avg)
     error_avg = error_total / RUNS
-    print("\nAverage in sample square error is:")
-    print("Ein(w) = ", error_avg)
+    print("\nAverage ratio for the mismatch between f(x) and h(x) outside of the training data:")
+    print("P(f(x)!=h(x)) = ", error_avg)
+
+    # IMPORTANT:  This is the main for linear_regression
+    # linear_regression = LinearRegression()
+    # error_insample_total, error_outsample_total, weights = linear_regression.main()
+    # error_insample_avg = error_insample_total / RUNS
+    # error_outsample_avg = error_outsample_total / RUNS
+    # print("\nAverage in sample classification error is:")
+    # print("Ein(w) = ", error_insample_avg)
+    # print("Eout(w) = ", error_outsample_avg)
