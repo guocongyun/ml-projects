@@ -15,13 +15,25 @@ TEST_DATA_NUM = 1000
 # however, since we a linear target function, we are only using two variabls z === 0 
 # hence constant*1 + slope*x1 -1*x2 = 0 => constant*1 + slope*x1 = y
 
-
 # hence w0+w1x+w2y = 0
 # hence x = 0 => y = -w0/w2
 # hence y = 0 => x = -w0/w1
 # hence slope = -(w0/w2)/(w0/w1)
 # intercept =-w0/w2
 
+# dataset = dataset() will cause referenced before assignment error
+
+# return 1 if x[0] * slope + constant > x[1] else -1 target function is a line, and you classify the points based on if they are on the line or not 
+
+# x * classification = np.dot(x, classification)
+# The default dtpye of np array is float
+# matmul or @ doesn't support sclar multiplication,i.e. 1*matrix
+# classification * x doesn't work unless both are array or list
+# prediction = np.sign(dataset.X @ self.weight) # the position in dot or @ product matters
+# matmul automaticlly traspose the multiplication, i.e. X.T @ Y == np.malmut(X,Y)
+
+# plt.gca().set_aspect(1) # this makes the plot more symmetric
+# plt.plot((-1,1),(actual_y_left, actual_y_right), color="green")  -1->actual_y_left and 1 -> actual_y_right
 
 class Dataset:
 
@@ -46,11 +58,8 @@ class Dataset:
         return self.X, self.Y
 
     def classification(self, x, target_function, classify):
-        if classify: return int(np.sign(np.transpose(x) @ target_function)) # matmul automaticlly traspose the multiplication, i.e. X.T @ Y == np.malmut(X,Y)
+        if classify: return int(np.sign(np.transpose(x) @ target_function)) 
         else: return int(np.matmul(np.transpose(x) @ target_function))
-
-        # return 1 if x[0] * slope + constant > x[1] else -1 
-        # IMPORTANT target function is a line, and you classify the points based on if they are on the line or not 
 
     def create_target_function(self):
         x0, y0, x1, y1 = self.rand_point(4)
@@ -93,12 +102,6 @@ class Perceptron:
             
             if misclassified:
                 x, classification = misclassified[np.random.choice(len(misclassified))] # random.choice doesn't pop the item
-                # IMPORTANT 
-                # x * classification = np.dot(x, classification)
-                # The default dtpye of np array is float
-                # matmul or @ doesn't support sclar multiplication,i.e. 1*matrix
-                # classification * x doesn't work unless both are array or list
-
                 self.weights = self.weights + classification * x 
                 iteration_total += 1 # iteration num means the num of changes
 
@@ -117,8 +120,6 @@ class Perceptron:
         return error_total
 
     def plot(self, dataset):
-        # print(self.target_function)
-        # print(self.weights)
         cs = ["red" if y > 0 else "blue" for y in dataset.Y]
         plt.scatter([x[1] for x in dataset.X], [x[2] for x in dataset.X], c=cs)
         y_left = (self.weights[1] - self.weights[0]) / self.weights[2]
@@ -127,7 +128,6 @@ class Perceptron:
 
         actual_y_left = + dataset.target_function[0] - dataset.target_function[1]
         actual_y_right = dataset.target_function[0] + dataset.target_function[1]
-        # print(actual_y_left,actual_y_right)
         plt.plot((-1,1),(actual_y_left, actual_y_right), color="green")
 
 
@@ -142,7 +142,7 @@ class Perceptron:
         error_total = 0
 
         for _ in range(RUNS):
-            dataset_ = Dataset() # IMPORTANT dataset = dataset() will cause referenced before assignment error
+            dataset_ = Dataset() 
             iteration_total = self.training(iteration_total, dataset_)
             error_total = self.testing(error_total, dataset_)
         return iteration_total, error_total
@@ -160,14 +160,6 @@ class LinearRegression():
         peusdo_inverse = inverse_XTX @ transpose_X
         self.weight = peusdo_inverse @ dataset.Y
 
-        # print(dataset.X)
-        # print(inverse_XTX)
-        # print(peusdo_inverse)
-        # print(dataset.Y)
-        # print(target_function)
-        # print(peusdo_inverse @ dataset.Y)
-        # print(np.dot(peusdo_inverse, dataset.Y))
-        # exit()
         return self.weight
 
     def testing(self, error_total, dataset, insample = True): # Calculating Error in, Ein and Error out, Eo
@@ -182,8 +174,6 @@ class LinearRegression():
 
         prediction = np.sign(dataset.X @ self.weight) # the position in dot or @ product matters
         actual_value = np.array(dataset.Y)
-        # print(prediction)
-        # print(actual_value)
         if (not insample): classification_error = sum(prediction != actual_value)/TEST_DATA_NUM
         elif(insample): classification_error = sum(prediction != actual_value)/TRAIN_DATA_NUM
         error_total += classification_error
@@ -192,7 +182,7 @@ class LinearRegression():
     def main(self):
         error_insample_total = 0
         error_outsample_total = 0
-        dataset_ = Dataset() # IMPORTANT dataset = dataset() will cause referenced before assignment error
+        dataset_ = Dataset()
 
         for _ in range(RUNS):
             _ = self.training(dataset_)
@@ -203,7 +193,7 @@ class LinearRegression():
 
 
 if __name__ == "__main__":
-    # IMPORTANT:  This is the main for perceptron
+    ##  This is the main for perceptron  ##
     perceptron = Perceptron()
     iteration_total, error_total = perceptron.main()
     iterations_avg = iteration_total / RUNS
@@ -212,7 +202,7 @@ if __name__ == "__main__":
     print("\nAverage ratio for the mismatch between f(x) and h(x) outside of the training data:")
     print("P(f(x)!=h(x)) = ", error_avg)
 
-    # IMPORTANT:  This is the main for linear_regression
+    ##  This is the main for linear_regression  ##
     # linear_regression = LinearRegression()
     # error_insample_total, error_outsample_total, weights = linear_regression.main()
     # error_insample_avg = error_insample_total / RUNS

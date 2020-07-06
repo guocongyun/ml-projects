@@ -15,7 +15,7 @@ class Dataset:
 
         self.X, self.Y  = [], []
         
-        for _ in range(n): # don't use np append in a loop as it's slow
+        for _ in range(n): # don't use np.array.append in a loop as it's slow
             x1 , x2 = self.rand_point(2)
             x = np.array([1, x1, x2])
             y = self.target_function(x, classify)
@@ -23,8 +23,6 @@ class Dataset:
             if (np.random.randint(0,10) == 0): y = -y # add noise to y
             x = self.transformation(x) # transform x
 
-            # print(len(x))
-            # exit()
             self.X.append(x)
             self.Y.append(y)
 
@@ -57,14 +55,9 @@ class LinearRegression():
         inverse_XTX = np.linalg.pinv(transpose_X @ dataset.X)
         peusdo_inverse = inverse_XTX @ transpose_X
         self.weight = peusdo_inverse @ dataset.Y
-        # print(len(self.weight))
-        # print(len(dataset.X[0]))
-        # print(len(inverse_XTX[0]))
-        # print(len(peusdo_inverse))
-        # exit()
         return self.weight
 
-    def testing(self, error, dataset, insample = True): # Calculating Error in, Ein and Error out, Eo
+    def testing(self, error, dataset, insample = True): # Calculating Errorin and Errorout
 
         # Generate new data if testing outsample error
         if (TEST_DATA_NUM != 0 and not insample): dataset.generate_data(True, TEST_DATA_NUM)
