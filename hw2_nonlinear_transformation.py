@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 RUNS = 1000
-TRAIN_DATA_NUM = 1000
+TRAIN_DATA_NUM = 10
 TEST_DATA_NUM = 1000
 
 class Dataset:
@@ -48,8 +48,6 @@ class LinearRegression():
         self.temp_weight = 1
     
     def training(self, dataset): 
-        if (dataset.target_function == None): dataset.create_target_function()
-
         dataset.generate_data(True, TRAIN_DATA_NUM)
         transpose_X = np.transpose(dataset.X)
         inverse_XTX = np.linalg.pinv(transpose_X @ dataset.X)
