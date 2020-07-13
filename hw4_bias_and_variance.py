@@ -20,7 +20,7 @@ class Dataset:
             x1 = self.rand_point(1)
             # x = np.array(x1) # 0.23, 0.24 1) y=ax
             # x = np.array([1]) # 0.51, 0.26 2) y=b
-            x = np.array([1, x1], dtype=float) # 0.50 1.75 3) y=ax+b
+            x = np.array([1, x1], dtype=float) # 0.50 1.75  3) y=ax+b
             # x = np.array(x1) # 0.504 33.5 4) y=ax^2
             # x = np.array([1, x1], dtype=float) # 0.594 326.5 4) y=ax^2 + b
             

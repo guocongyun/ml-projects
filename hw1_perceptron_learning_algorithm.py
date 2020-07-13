@@ -172,6 +172,7 @@ class LinearRegression():
         # square_error = 1/TRAIN_DATA_NUM * square_error # @ means matrix multiplication
         # error_total += square_error
 
+        # testing using classification error
         prediction = np.sign(dataset.X @ self.weight) # the position in dot or @ product matters
         actual_value = np.array(dataset.Y)
         if (not insample): classification_error = sum(prediction != actual_value)/TEST_DATA_NUM
@@ -187,7 +188,7 @@ class LinearRegression():
         for _ in range(RUNS):
             _ = self.training(dataset_)
             error_insample_total = self.testing(error_insample_total, dataset_, True)
-            error_outsample_total = self.testing(error_insample_total, dataset_, False)
+            error_outsample_total = self.testing(error_outsample_total, dataset_, False)
 
         return error_insample_total,error_outsample_total, self.weight
 
