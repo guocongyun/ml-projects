@@ -1,6 +1,7 @@
 import numpy as np
-from graphviz import Digraph
+from graphviz import Digraph, Source
 import matplotlib.pyplot as plt
+from IPython.display import display
 from sympy import diff, symbols
 
 class Layer:
@@ -9,7 +10,7 @@ class Layer:
         self.size = neurons + 1
         self.weights = np.array([np.zeros(prev_layer_size) for _ in range(self.size)])
         self.output = np.ones(self.size)
-        self.delta = 0
+        self.delta = np.ones(self.size)
 
 class NeuralNetwork:
     
@@ -17,7 +18,8 @@ class NeuralNetwork:
         self.layers = []
         self.prediction = 0.0
         self.actual_value = 0.0
-        self.learning_grade =0.1
+        self.learning_rate =0.1
+        self.weight_decay_rate = 0.0001/TRAIN
 
     def input_layer(self, neurons):
         layer = Layer(neurons)
@@ -34,6 +36,7 @@ class NeuralNetwork:
     def output_layer(self, neurons=1):
         layer = Layer(neurons-1, self.layers[-1].size)
         prev_layer_size = self.layers[len(self.layers)-1].size
+        # print("size is {}".format(layer.size))
         layer.weights[0:] = np.random.randn(neurons, prev_layer_size) * np.sqrt(1/(prev_layer_size))
         self.layers.append(layer)
 
@@ -47,13 +50,11 @@ class NeuralNetwork:
         return weights
 
     def theta(self, s):
-        print(type(s))
-        return np.tanh(s) # IMPORTNAT np.tanh only support floats
+        return np.tanh(s) 
+        # IMPORTNAT np.tanh only support floats, not symbols
 
     def theta_deriv(self, s):
-        u = symbols("u")
-        derivative = lambda s: np.array(diff(self.theta(u),u).subs({u:s}))
-        return derivative(s)
+        return 1-np.tanh(s)**2
 
     def err_func(self, x, y):
         return (x - y)**2   
@@ -71,53 +72,146 @@ class NeuralNetwork:
                 layer.output[1:] = x
             else:
                 input_ = self.layers[index-1].output
-                for neuron in range(layer.size):
-                    signal = layer.weights[neuron] @ np.transpose(input_)
-                    output = self.theta(signal)
-                    layer.output[0:] = output
+
+                signal = layer.weights @ np.transpose(input_)
+                output = self.theta(signal)
+                layer.output = output
+
                 if index == len(self.layers)-1:
-                    print("layer output is: %s"%layer.output)
-                    self.prediction = layer.output
+                    layer.output[0] = output
+                    self.prediction = layer.output[0]
 
-
+    def graphviz(self): # ISSUE how to rearrange the nodes
+        dot = Digraph(engine="neato")
+        L = len(self.layers) - 1
+        for layer in range(0, L+1):
+            # Nodes
+            for node in range(self.layers[layer].size):
+                dot.node("x({})[{}]".format(layer, node), pos="{},{}!".format(node,-1*layer))
+                # Forward edges
+                if layer < L:
+                    for i in range(0, self.layers[layer+1].size):
+                        w = self.layers[layer+1].weights[i][node]
+                        # IMPORTANT, for np arrays only list[a,b] === list[a][b]
+                        if w < 0:
+                            color = "red"
+                            w = -w
+                        else:
+                            color = "blue"
+                        dot.edge(
+                            "x({})[{}]".format(layer, node), "x({})[{}]".format(layer+1, i),
+                            arrowhead="none",
+                            penwidth="{}".format(w),
+                            color=color
+                        )
+        # display(dot) 
+        # s = Source(dot,filename="neural_network.gv",format="png")
+        # s.view()
 
     def backpropagation(self, y):
         self.actual_value = y
-        for index in range(1,len(self.layers)): # doesn't count the input layer
-            layer = self.layers[len(self.layers) - index] # backwards
-            prev_layer = self.layers[len(self.layers) - index - 1] # backwards
-            if layer == self.layers[-1]:
-                print(self.prediction)
-                print(self.actual_value)
-                err_deriv = self.err_deriv(self.prediction,self.actual_value)
-                signal = layer.weights[0] @ np.transpose(prev_layer.output)
-                print(signal)
-                theta_deriv = self.theta_deriv(signal)
-                layer.delta = err_deriv * theta_deriv
-                # IMPORTANT numpy functions require float type argument explicity
 
-            else:
-                input_ = prev_layer.output
-                for neuron in range(layer.size):
-                    layer.delta += (1 - (input_)**2) * layer.weights[neuron] * self.layers[len(self.layers) - index + 1 ].delta
+        L = len(self.layers) - 1
+        layer = self.layers[L] 
+        prev_layer = self.layers[L - 1] 
+
+        err_deriv = self.err_deriv(self.prediction,self.actual_value)
+        signal = layer.weights[0] @ np.transpose(prev_layer.output)
+        theta_deriv = self.theta_deriv(self.theta(signal))
+        self.layers[L].delta[0] = err_deriv * theta_deriv
+
+
+        for index in range(L-1,0,-1): # doesn't count the input layer
+            layer = self.layers[index] 
+            prev_layer = self.layers[index - 1] 
+            next_layer = self.layers[index +  1]
+
+            input_ = prev_layer.output
+            for this_ in range(layer.size):
+                self.layers[index].delta[this_] = 0
+                for next_ in range(next_layer.size):
+                    # print("what")
+                    # print(next_)
+                    # print(next_layer.weights[next_][this_])
+                    # print(next_layer.delta)
+                    # print(next_layer.delta[0])
+                    # print((1 - (input_)**2) * next_layer.weights[next_][this_] * next_layer.delta[next_])
+                    # print(self.layers[index].delta[this_])
+                    self.layers[index].delta[this_] = (1 - (input_[this_])**2) * next_layer.weights[next_][this_] * next_layer.delta[next_]
+
+
+            # IMPORTANT numpy functions require float type argument explicity
+
 
     def update(self):
         for index in range(1,len(self.layers)): # doesn't count the input layer
-            layer = self.layers[len(self.layers) - index]
-            prev_layer = self.layers[len(self.layers) - index - 1]
+            layer = self.layers[index] # IMPORTANT, list are passed by reference in python not value
+            prev_layer = self.layers[index - 1]
             for _ in range(len(layer.weights)):
                 weight = layer.weights[_]
                 input_ = prev_layer.output
-                weight = weight - self.learning_grade * input_ * weight
+                weight_decay = - 2 * self.learning_rate * weight * self.weight_decay_rate
+                layer.weights[_] = weight - self.learning_rate * input_ * layer.delta[_] - weight_decay
+
+
+    def train(self, rand_mean):
+        total_error = 0
+        iter_num = 0
+        for _ in range(TRAIN):
+            # rand_mean = np.random.uniform(-1,1)
+            # rand_var = np.random.uniform(0,1)
+            rand_sample = np.random.normal(rand_mean,1,100)
+            
+            self.predict(rand_sample)
+            self.backpropagation(rand_mean)
+            iteration_error = self.err_func(self.prediction,self.actual_value)
+            total_error += iteration_error
+            iter_num += 1
+            self.update()
+            if iteration_error < 0.00000000001:
+                break
+        print(iter_num)
+        print(rand_mean)
+        print(self.prediction)
+        print(self.err_func(self.prediction,self.actual_value))
+        return total_error/TRAIN
+
+    def test(self, rand_mean):
+        total_error = 0
+        print("rand mean is: {}".format(rand_mean))
+        for _ in range(TEST):
+
+            rand_sample = np.random.normal(rand_mean,1,100)
+            self.predict(rand_sample)
+            if _%100 == 0: print(self.prediction)
+            iteration_error = self.err_func(self.prediction,self.actual_value)
+            total_error += iteration_error
+
+        return total_error/TEST
+
+    def main(self):
+        total_insample_error = 0
+        total_outsample_error = 0
+        for _ in range(RUNS):
+            rand_mean = np.random.uniform(-1,1)
+            total_insample_error += self.train(rand_mean)
+            total_outsample_error += self.test(rand_mean)
+        total_insample_error /= RUNS
+        total_outsample_error /= RUNS
+        print("total in sample error is: {}".format(total_insample_error))
+        print("total out sample error is: {}".format(total_outsample_error))
+
+TRAIN = 3000
+TEST = 3000
+RUNS = 10
 
 if __name__ == "__main__":
     neural_network = NeuralNetwork()
-    neural_network.input_layer(3)
+    neural_network.input_layer(100)
     neural_network.add_layer(2)
     neural_network.output_layer(1)
-    neural_network.predict([2,2,2])
-    neural_network.backpropagation(1)
-    neural_network.update()
+    neural_network.main()
+    neural_network.graphviz()
     
 
     
