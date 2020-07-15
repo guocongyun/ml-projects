@@ -19,7 +19,7 @@ class NeuralNetwork:
         self.prediction = 0.0
         self.actual_value = 0.0
         self.learning_rate =0.1
-        self.weight_decay_rate = 0.0001/TRAIN
+        self.weight_decay_rate = 0.0001
 
     def input_layer(self, neurons):
         layer = Layer(neurons)
@@ -105,8 +105,8 @@ class NeuralNetwork:
                             color=color
                         )
         # display(dot) 
-        # s = Source(dot,filename="neural_network.gv",format="png")
-        # s.view()
+        s = Source(dot,filename="neural_network.gv",format="png")
+        s.view()
 
     def backpropagation(self, y):
         self.actual_value = y
@@ -148,6 +148,7 @@ class NeuralNetwork:
             layer = self.layers[index] # IMPORTANT, list are passed by reference in python not value
             prev_layer = self.layers[index - 1]
             for _ in range(len(layer.weights)):
+                # print(layer.weights[_])
                 weight = layer.weights[_]
                 input_ = prev_layer.output
                 weight_decay = - 2 * self.learning_rate * weight * self.weight_decay_rate
@@ -160,7 +161,7 @@ class NeuralNetwork:
         for _ in range(TRAIN):
             # rand_mean = np.random.uniform(-1,1)
             # rand_var = np.random.uniform(0,1)
-            rand_sample = np.random.normal(rand_mean,1,100)
+            rand_sample = np.random.normal(rand_mean,1,10)
             
             self.predict(rand_sample)
             self.backpropagation(rand_mean)
@@ -168,8 +169,8 @@ class NeuralNetwork:
             total_error += iteration_error
             iter_num += 1
             self.update()
-            if iteration_error < 0.00000000001:
-                break
+            # if iteration_error < 0.00000000001:
+            #     break
         print(iter_num)
         print(rand_mean)
         print(self.prediction)
@@ -181,7 +182,7 @@ class NeuralNetwork:
         print("rand mean is: {}".format(rand_mean))
         for _ in range(TEST):
 
-            rand_sample = np.random.normal(rand_mean,1,100)
+            rand_sample = np.random.normal(rand_mean,1,10)
             self.predict(rand_sample)
             if _%100 == 0: print(self.prediction)
             iteration_error = self.err_func(self.prediction,self.actual_value)
@@ -198,16 +199,17 @@ class NeuralNetwork:
             total_outsample_error += self.test(rand_mean)
         total_insample_error /= RUNS
         total_outsample_error /= RUNS
+        print(self.layers[1].weights) # IMPORTANT, neural network need to update the bias term i.e. the x0=1 weights/ bias
         print("total in sample error is: {}".format(total_insample_error))
         print("total out sample error is: {}".format(total_outsample_error))
 
 TRAIN = 3000
 TEST = 3000
-RUNS = 10
+RUNS = 1
 
 if __name__ == "__main__":
     neural_network = NeuralNetwork()
-    neural_network.input_layer(100)
+    neural_network.input_layer(10)
     neural_network.add_layer(2)
     neural_network.output_layer(1)
     neural_network.main()
