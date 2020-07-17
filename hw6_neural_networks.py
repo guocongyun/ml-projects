@@ -147,12 +147,12 @@ class NeuralNetwork:
         for index in range(1,len(self.layers)): # doesn't count the input layer
             layer = self.layers[index] # IMPORTANT, list are passed by reference in python not value
             prev_layer = self.layers[index - 1]
-            for _ in range(len(layer.weights)):
+            for num in range(len(layer.weights)): # IMPORTANT only use _ in for loop if _ meant to be discarded
                 # print(layer.weights[_])
-                weight = layer.weights[_]
+                weight = layer.weights[num]
                 input_ = prev_layer.output
                 weight_decay = - 2 * self.learning_rate * weight * self.weight_decay_rate
-                layer.weights[_] = weight - self.learning_rate * input_ * layer.delta[_] - weight_decay
+                layer.weights[num] = weight - self.learning_rate * input_ * layer.delta[num] - weight_decay
 
 
     def train(self, rand_mean):

@@ -22,43 +22,25 @@ def constraints_satisfied(x):
     return G @ x <= h
 
 
+def plot_contour(function_, range_=[-1,1]): # IMPORTANT, don't give any python method as names for variabls
 
-xx, yy = np.linspace(-2, 20,100), np.linspace(-5, 5,100) # IMPORTANT, xx, yy === x1, x2
-XX, YY = np.meshgrid(xx, yy) # IMPORTANT, XX = [[-2...20]..], YY = [[-5...-5]...[5...5]]
-print(XX) 
-print(YY)
-ZZ_matrix = np.zeros(XX.shape)
-ZZ_original = np.zeros(XX.shape)
-constraints = np.zeros(XX.shape)
-
-for iy in range(XX.shape[0]): # IMPORTANT, np array.shape[0] ==  len(array), nparray.shape[1] == len(array[0])
-    for ix in range(XX.shape[1]):
-        x = np.array([[XX[iy,ix]], [YY[iy,ix]]])
-        ZZ_matrix[iy,ix] = f_matrix(x)
-        if np.all(constraints_satisfied(x)):
-            constraints[iy,ix] = 1
-
-plt.xlabel("x")
-plt.ylabel("y")
-plt.contourf(XX, YY, ZZ_matrix, 100)
-plt.contour(XX, YY, constraints)
-
-plt.show()
-
-P = cvxopt.matrix(np.array([[1.5, 1],
-              [1.0, 0.5]]))
-
-q = cvxopt.matrix(np.array([[1.0], 
-              [6.0]]))
-
-G = cvxopt.matrix(np.array([
-    [-2.0, 3.0],
-    [-1.0, 0.0],
-    [0.0, -1.0],
-]))
+    xx, yy = np.linspace(range_[0],range_[1],100), np.linspace(range_[0],range_[1],100) # IMPORTANT, xx, yy === x1, x2
+    XX, YY = np.meshgrid(xx, yy) # IMPORTANT, XX = [[-2...20]..], YY = [[-5...-5]...[5...5]]
+    ZZ_matrix = np.zeros(XX.shape)
+    constraints = np.zeros(XX.shape)
     
-h = cvxopt.matrix(np.array([[4.0], 
-              [0.0], 
-              [0.0]]))
+    for row in range(100): # IMPORTANT, np array.shape[0] ==  len(array), nparray.shape[1] == len(array[0])
+        for col in range(XX.shape[1]):
+            x = np.array([[XX[row,col]], [YY[row,col]]])
+            ZZ_matrix[row,col] = function_(x)
+            if np.all(constraints_satisfied(x)):
+                constraints[row,col] = 1
 
-print(cvxopt.solvers.qp(P, q, G, h)["x"])
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.contourf(XX, YY, ZZ_matrix, 100)
+    plt.contour(XX, YY, constraints)
+
+    plt.show()
+
+plot_contour(function_)
