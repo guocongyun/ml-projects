@@ -123,10 +123,8 @@ class SVM():
             pass
         
     def predict(self, X, classify=True):
-        if self.kernel = linear_kernel:
-            if classify: self.prediction = np.sign(self.weights @ X.T + self.bias)
-            else:self.prediction = self.weights @ X.T + self.bias
-        else:
+        if classify: self.prediction = np.sign(self.weights @ X.T + self.bias)
+        else:self.prediction = self.weights @ X.T + self.bias
             
         return self.prediction
 
@@ -146,8 +144,8 @@ def plot_contour(function_, dataset, range_=[-1,1]): # IMPORTANT, don't give any
     # mshgrid create 100x100 element matrix
     ZZ = np.zeros(XX.shape)
 
-    # 1) creating ZZ list using slices
-    ZZ[:,:] = function_.predict(np.array([1,XX[:,:], YY[:,:]]),False)
+    # 1) creating using matrix multiplications
+    ZZ = function_.predict(np.array([1,XX, YY]),False)
 
     # 2) creating ZZ list using for loops
     # for row in range(XX.shape[0]): # IMPORTANT, np array.shape[0] ==  len(array), nparray.shape[1] == len(array[0])
