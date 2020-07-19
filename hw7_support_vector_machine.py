@@ -146,6 +146,8 @@ def plot_contour(function_, dataset, range_=[-1,1]): # IMPORTANT, don't give any
 
     # 1) creating using matrix multiplications
     ZZ = function_.predict(np.array([1,XX, YY]),False)
+    print(np.array([1,XX, YY]))
+    print(ZZ)
 
     # 2) creating ZZ list using for loops
     # for row in range(XX.shape[0]): # IMPORTANT, np array.shape[0] ==  len(array), nparray.shape[1] == len(array[0])
