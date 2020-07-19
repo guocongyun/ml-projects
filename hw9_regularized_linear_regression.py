@@ -52,7 +52,7 @@ phi = lambda data_set: np.array([
     data_set[:,2]**2]).T
 
 for alpha in [1,0.01]:
-    IMPORTANT need to transpose the data to have the original shape
+    # IMPORTANT need to transpose the data to have the original shape
     clf = linear_model.RidgeClassifier(alpha=alpha)
     train_data_set = one_vs_one(1,5, data_train)
     test_data_set = one_vs_one(1,5, data_test)
