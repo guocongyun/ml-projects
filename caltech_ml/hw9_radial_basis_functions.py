@@ -31,17 +31,17 @@ class DataSet:
 
 #%%
 
-def plot_points(data):
+def plot_points(data, plot):
     above = (data[:,3] > 0)
     below = (data[:,3] < 0)
     # print(data_set)
-    plt.scatter(data[above,1],data[above,2])
-    plt.scatter(data[below,1],data[below,2])
-    if (data[0][0] == 0): plt.scatter(data[:,1],data[:,2],s=100)
+    plot.scatter(data[above,1],data[above,2])
+    plot.scatter(data[below,1],data[below,2])
+    if (data[0][0] == 0): plot.scatter(data[:,1],data[:,2],s=100)
 
 
-def plot_contour(target_function, range_=(-1,1)):
-    size = 100
+def plot_contour(target_function, plot, range_=(-1,1)):
+    size = 50
     xx, yy = np.linspace(range_[0],range_[1],size), np.linspace(range_[0],range_[1],size) # IMPORTANT, xx, yy === x1, x2
     XX, YY = np.meshgrid(xx, yy) # IMPORTANT, XX = [[-2...20]..], YY = [[-5...-5]...[5...5]]
     ZZ = np.zeros(XX.shape)
@@ -49,10 +49,10 @@ def plot_contour(target_function, range_=(-1,1)):
     # print(np.stack((XX, YY),axis=2).reshape(25,2))
     # print(f"XX{XX}YY{YY}")
     ZZ = target_function(np.stack((np.ones(XX.shape),XX, YY),axis=2).reshape(size*size,3)).reshape(XX.shape)
-    plt.gca().set_aspect(1)
-    plt.xlabel("x")
-    plt.ylabel("y")
-    plt.contourf(XX, YY, ZZ, [-1,0,1]) # the last parameter is the range of the 2 level, from -1 to 0 and from 0 to 1
+    # plot.gca().set_aspect(1)
+    plot.set_xlabel("x")
+    plot.set_ylabel("y")
+    plot.contourf(XX, YY, ZZ, [-1,0,1]) # the last parameter is the range of the 2 level, from -1 to 0 and from 0 to 1
 
 #%%
 
@@ -161,7 +161,7 @@ k = 9
 gamma = 1.5
 regular_rbf = RegularRBF(k, gamma)
 
-while count < 100:
+while count < 10:
     data_set.generate_points(100)
 
     regular_rbf.fit(data_set.Data)
@@ -193,10 +193,13 @@ print(f"percent of soft margin is {round(soft_margin/100,3)}")
 print(f"svm_win is {svm_win/100}")
 print(f"rbf_win is {rbf_win/100}")
 
-# plot_contour(data_set.target_function,(-1,1))
-# plot_contour(regular_rbf.predict,(-1,1))
-# plot_contour(gaussian_svm.predict,(-1,1))
-# plot_points(regular_rbf.clusters_pos)
+fig, axes = plt.subplots(1,3,sharey=True)
 
-# plot_points(data_set.Data)
-# plt.show()
+for n in range(3):
+    if n == 0:plot_contour(data_set.target_function, axes[n], (-1,1))
+    if n == 1:plot_contour(regular_rbf.predict, axes[n], (-1,1))
+    if n == 2:plot_contour(gaussian_svm.predict, axes[n], (-1,1))
+    plot_points(regular_rbf.clusters_pos, axes[n])
+    plot_points(data_set.Data, axes[n])
+
+plt.show()
