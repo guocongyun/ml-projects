@@ -53,8 +53,6 @@ y = df_test.loc[:].to_numpy().T # head() returns a list of list, loc returns a l
 prediction = fit_weighted(X, y, 5) # NOTE reshape can not change how value in list are stored, i.e. [[1,2],[3,4]] can't be [[3,4],[4,2]]
 df_test = pd.DataFrame(prediction, index=X[:,1])
 
-wave_length_right = X[:,1] >= 1300
-wave_length_left = X[:,1] < 1200
 df_test_right = df_test[wave_length_right].T
 df_test_left = df_test[wave_length_left].T
 # VERY IMPORTANT, if index of column name of two dataframe is different in type or value, calculation when result in Nan
@@ -70,7 +68,7 @@ def distance(f1, f2):
     return np.sum((f1 - f2)**2,axis=1)
 #%%
 err = []
-
+predictions = []
 for index, row in df_test_right.iterrows():
     dist = distance(df_train_right, row)
     # IMPORTANT, sum over axis=1 is sum vertically axis = 0 sums horizontally 
@@ -83,13 +81,26 @@ for index, row in df_test_right.iterrows():
     eq2 = np.sum([ker(item/max_d) for (k, item) in neighb.iteritems()], axis=0)
 
     f_left_hat = eq1/eq2
+    predictions.append(f_left_hat)
     err.append(np.sum((f_left_hat - df_test_left.loc[index]) ** 2))
 
 print(np.mean(err))
 
 #%%
-plt.plot(X[:, 1], y[:,0])
-plt.plot(X[:, 1], prediction[:,0])
+# plt.plot(X[:, 1], y[:,0])
+# plt.plot(X[:, 1], prediction[:,0])
 # IMPORTANT, plt.plot first paramter is the x-axis
-# plt.show()
+
+#%%
+fig, axes = plt.subplots(2,2)
+axes = axes.ravel()
+
+for num in range(4):
+    # print(prediction)
+    # print(prediction.shape)
+    # exit()
+    axes[num].plot(X[wave_length_left,1], df_test_left.loc[num], label="actual value")
+    axes[num].plot(X[wave_length_left,1], predictions[num], label="predicted")
+    axes[num].legend()
+plt.show()
 
