@@ -6,3 +6,5 @@ stanford_ml/prob_4/labels_test.csv
 stanford_ml/prob_4/labels_train.csv
 stanford_ml/prob_4/__pycache__/cart_pole.cpython-38.pyc
 stanford_ml/prob_4/tempCodeRunnerFile.py
+stanford_ml/prob_1/mnist.zip
+stanford_ml/prob_4/mnist.zip
