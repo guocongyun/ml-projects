@@ -191,6 +191,6 @@ test_data = data_set[1].drop(['Survived'], axis=1) # drop survived==nan
 prediction = model.predict(test_data) # since output layer is sigmoid we have to map it to int
 prediction = np.array(list(map(lambda data: int(np.round(data)), prediction)))
 
-output = pd.DataFrame({'PassengerId' : range(1,len(prediction)+1), 'Survived' : prediction})
+output = pd.DataFrame({'PassengerId' : pd.read_csv('test.csv')['PassengerId'], 'Survived' : prediction})
 print(output)
 output.to_csv('my_submission.csv', index=False)
