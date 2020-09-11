@@ -56,6 +56,7 @@ from utils import read_corpus, batch_iter
 from vocab import Vocab, VocabEntry
 
 import torch
+torch.set_default_tensor_type(torch.cuda.FloatTensor)
 import torch.nn.utils
 
 
