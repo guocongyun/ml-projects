@@ -29,7 +29,7 @@ def pad_sents_char(sents, char_pad_token):
     """
     # Words longer than 21 characters should be truncated
     max_word_length = 21
-
+    max_sent_length = np.max([len(sent) for sent in sents])
     ### YOUR CODE HERE for part 1f
     ### TODO:
     ###     Perform necessary padding to the sentences in the batch similar to the pad_sents()
@@ -41,6 +41,14 @@ def pad_sents_char(sents, char_pad_token):
     ###     You should NOT use the method `pad_sents()` below because of the way it handles
     ###     padding and unknown words.
 
+    pad = lambda pad_token, objs, max: [obj if len(obj)==max else obj[:max] if len(obj)>max else obj+pad_token*(max-len(obj)) for obj in objs]
+
+    # print([char_pad_token]*5)
+    words_padded = [pad([char_pad_token], words, max_word_length) for words in sents]
+    sents_padded = pad([[char_pad_token]*max_word_length], words_padded, max_sent_length)
+    # sents_padded = pad_sents([pad([char_pad_token], words, max_word_length) for sent in sents],[char_pad_token]*5)
+
+    # sents_padded = [pad([[char_pad_token]], [pad([char_pad_token], word, max_word_length) for word in sent], max_sent_length) for sent in sents]
 
     ### END YOUR CODE
 
@@ -60,7 +68,10 @@ def pad_sents(sents, pad_token):
     sents_padded = []
 
     ### COPY OVER YOUR CODE FROM ASSIGNMENT 4
-
+    corpus_size = len(sents)
+    lens = [len(i) for i in sents] # cache it for later use
+    max_lens = max(lens)
+    sents_padded = [sents[i] + [pad_token] * (max_lens - lensmax_sent_length[i]) for i in range(corpus_size)] # shape N x max_lens
 
     ### END YOUR CODE FROM ASSIGNMENT 4
 

@@ -120,6 +120,9 @@ class VocabEntry(object):
         @return word_ids (list[list[list[int]]]): sentence(s) in indices
         """
         ### YOUR CODE HERE for part 1e
+        
+        word_ids = [[[self.start_of_word] + [self.char2id.get(char) for char in word] + [self.end_of_word] for word in sent] for sent in sents]
+
         ### TODO: 
         ###     This method should convert characters in the input sentences into their 
         ###     corresponding character indices using the character vocabulary char2id 
@@ -128,8 +131,9 @@ class VocabEntry(object):
         ###     You must prepend each word with the `start_of_word` character and append 
         ###     with the `end_of_word` character. 
 
-
         ### END YOUR CODE
+
+        return word_ids
 
     def words2indices(self, sents):
         """ Convert list of sentences of words into list of list of indices.
@@ -159,6 +163,10 @@ class VocabEntry(object):
         ###     Connect `words2charindices()` and `pad_sents_char()` which you've defined in 
         ###     previous parts
         
+        char_ids = self.words2charindices(sents)
+        padded_char_ids = pad_sents_char(char_ids, 0)
+        sents_var = torch.tensor(padded_char_ids, dtype=float, device=device).permute(1,0,2)
+        return sents_var
 
         ### END YOUR CODE
 
