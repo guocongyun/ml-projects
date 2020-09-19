@@ -153,7 +153,7 @@ class VocabEntry(object):
         """ Convert list of sentences (words) into tensor with necessary padding for 
         shorter sentences.
 
-        @param sents (List[List[str]]): list of sentences (words)
+        @p(xreshapedaram sents (List[List[str]]): list of sentences (words)
         @param device: device on which to load the tensor, i.e. CPU or GPU
 
         @returns sents_var: tensor of (max_sentence_length, batch_size, max_word_length)

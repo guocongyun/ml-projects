@@ -9,27 +9,27 @@ CS224N 2018-19: Homework 5
 import torch
 import torch.nn as nn
 
-class HighWay(nn.Module):
+class Highway(nn.Module):
     """ HighWay Layer, i.e. a layer of  highway network 
     that takes the output of convolutional network as input
     """
-    def __init__(self, embedded_word_size):
+    def __init__(self, embedded_char_size):
         """ Init HighWay Instance.
-        @param embedded_word_size: int
+        @param embedded_char_size: int
         """
-        super(HighWay, self).__init__()
-        self.embedded_word_size = embedded_word_size
-        self.proj_projection = nn.Linear(in_features=embedded_word_size,out_features=embedded_word_size)
-        self.gate_projection = nn.Linear(in_features=embedded_word_size,out_features=embedded_word_size)
+        super(Highway, self).__init__()
+        self.embedded_char_size = embedded_char_size
+        self.proj_projection = nn.Linear(in_features=embedded_char_size,out_features=embedded_char_size)
+        self.gate_projection = nn.Linear(in_features=embedded_char_size,out_features=embedded_char_size)
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x_conv_out):
         """ Run a forward step that map a batch of x_conv_out to x_high_way
-        @param x_conv_out: tensor of (batch_size, embedded_word_size)
-        @return x_highway: tensor of (batch_size, embedded_word_size)
+        @param x_conv_out: tensor of (max_sentence_length * batch_size, embedded_char_size, max_word_length)
+        @return x_highway: tensor of (max_sentence_length * batch_size, embedded_char_size)
         """
-        assert x_conv_out.size()[1] == self.embedded_word_size, print(f'{x_conv_out.size()} conv_out size')
+        assert x_conv_out.size()[1] == self.embedded_char_size, print(f'{x_conv_out.size()} conv_out size')
 
         x_proj = self.relu(self.proj_projection(x_conv_out)) # IMPORTANT torch.size() == (2,3)
         assert x_proj.size() == x_conv_out.size(), print(f'{x_proj.size()} x_proj size') # size should be number of embedded words x batch
@@ -46,7 +46,7 @@ class HighWay(nn.Module):
 
 if __name__ == '__main__':
     conv_out = torch.tensor([[0,0,0],[0,0,0]], dtype=torch.float)
-    highway = HighWay(embedded_word_size = 3)
+    highway = HighWay(embedded_char_size = 3)
     x_highway = highway.forward(conv_out)
     print(x_highway)
     # highway.forward()@

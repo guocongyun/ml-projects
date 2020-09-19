@@ -15,7 +15,9 @@ class CNN(nn.Module):
     """
     def __init__(self, input_channel_count, output_channel_count, kernel_size=5):
         """ Init HighWay Instance.
-        @param embedded_word_size: int
+        @param input_channel_count: int 
+        @param output_channel_count: int
+        @param kernel_size: int
         """
         super(CNN, self).__init__()
         self.input_channel_count = input_channel_count
@@ -25,22 +27,21 @@ class CNN(nn.Module):
                               kernel_size=kernel_size)
         self.max_pool = nn.AdaptiveMaxPool1d(output_size=1)
         self.relu = nn.ReLU()
-
+ 
     def forward(self, x_reshaped):
         """ Run a forward step that map a batch of x_reshaped to x_conv_out
-        @param x_reshaped: tensor of (max_sentence_length, batch_size, max_word_length)
-        @return x_conv_out: tensor of (batch_size, embedded_word_size)
+        @param x_reshaped: tensor of (max_sentence_length * batch_size, e_char, max_word_length)
+        @return x_conv_out: tensor of (max_sentence_length * batch_size, e_word)
         """
-        # IMPORTANT max_word_length == input_channel_count == e_char
         assert x_reshaped.size()[1] == self.input_channel_count, print(f'{x_reshaped.size()} x_reshaped size')
 
         x_conv = self.conv(x_reshaped)
-        assert x_conv.size()[1] == self.input_channel_count, print(f'{x_conv.size()} x_conv size')
+        assert x_conv.size()[1] == self.output_channel_count, print(f'{x_conv.size()} x_conv size')
 
         # x_conv_out = x_conv.max(dim=1) == np.max(dim1)
 
         x_conv_out = self.max_pool(x_conv).squeeze(dim=2)
-        assert x_conv_out.size()[1] == self.input_channel_count, print(f'{x_conv_out.size()} x_conv_out size')
+        assert x_conv_out.size()[1] == self.output_channel_count, print(f'{x_conv_out.size()} x_conv_out size')
 
         return x_conv_out
 

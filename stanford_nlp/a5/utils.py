@@ -71,7 +71,7 @@ def pad_sents(sents, pad_token):
     corpus_size = len(sents)
     lens = [len(i) for i in sents] # cache it for later use
     max_lens = max(lens)
-    sents_padded = [sents[i] + [pad_token] * (max_lens - lensmax_sent_length[i]) for i in range(corpus_size)] # shape N x max_lens
+    sents_padded = [sents[i] + [pad_token] * (max_lens - len(sents[i])) for i in range(corpus_size)] # shape N x max_lens
 
     ### END YOUR CODE FROM ASSIGNMENT 4
 
