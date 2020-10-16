@@ -25,8 +25,6 @@ TEST_DATA_NUM = 1000
 
 # return 1 if x[0] * slope + constant > x[1] else -1 target function is a line, and you classify the points based on if they are on the line or not 
 
-# x * classification = np.dot(x, classification)
-# The default dtpye of np array is float
 # matmul or @ doesn't support sclar multiplication,i.e. 1*matrix
 # classification * x doesn't work unless both are array or list
 # prediction = np.sign(dataset.X @ self.weight) # the position in dot or @ product matters
@@ -78,12 +76,15 @@ class Perceptron:
         self.weights = None
 
     def create_weights(self):
-        self.weights = np.zeros(3) # default type int
+        self.weights = np.zeros(3) 
+        # np.zeros(3): default type int
+        # np.array([3]): type int
+        # np.array([3.]): type float
 
     def predict(self, point):
         return np.sign(np.transpose(self.weights) @ point)
         
-    def training(self, iteration_total, dataset): # train the perceptron
+    def training(self, iteration_total, dataset): 
         if (dataset.target_function == None): dataset.create_target_function()
         X, Y = dataset.generate_data(dataset.target_function, TRAIN_DATA_NUM)
         
@@ -173,7 +174,7 @@ class LinearRegression():
         # error_total += square_error
 
         # testing using classification error
-        prediction = np.sign(dataset.X @ self.weight) # the position in dot or @ product matters
+        prediction = np.sign(dataset.X @ self.weight) 
         actual_value = np.array(dataset.Y)
         if (not insample): classification_error = sum(prediction != actual_value)/TEST_DATA_NUM
         elif(insample): classification_error = sum(prediction != actual_value)/TRAIN_DATA_NUM

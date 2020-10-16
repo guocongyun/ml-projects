@@ -7,7 +7,8 @@ class coin:
         self.tail = 0
 
     def flip(self):
-        if (np.random.randint(0,2,dtype=int) == 1): self.head += 1 # randint lower bound is inclusive, higher bound is exclusive
+        if (np.random.randint(0,2,dtype=int) == 1): self.head += 1 
+        # randint lower bound is inclusive, higher bound is exclusive
         else: self.tail += 1
 
 
