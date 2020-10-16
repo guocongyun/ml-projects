@@ -10,3 +10,5 @@ stanford_ml/prob_1/mnist.zip
 stanford_ml/prob_4/mnist.zip
 kaggle/Titanic/titanic.zip
 kaggle/titanic/titanic.zip
+stanford_reinforcement/a3/results/*
+**/__pycache__/*
