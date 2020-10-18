@@ -76,8 +76,6 @@ class kMeanClustering:
         self.clear_points()
         for x in self.data[:,:3]:
             distance = []
-            # print(x)
-            # exit()
             for cluster in self.clusters:
                 dist = np.linalg.norm(x[1:]-cluster.pos)
                 distance.append([dist,cluster])
@@ -98,7 +96,6 @@ class kMeanClustering:
     def get_clusters_pos(self):
         pos = []
         for num in range(len(self.clusters)):
-            # print(k_mean_clustering.clusters[num].pos)
             pos.append([0,self.clusters[num].pos[0],self.clusters[num].pos[1],0])
         return np.array(pos)
 
@@ -120,12 +117,7 @@ class RegularRBF:
         for cluster_pos in self.clusters_pos:
             # IMPORTANT np.linagle.norm return a 1d value
             phi_matrix.append(gaussian_kernel(data, cluster_pos))
-            # print(data)
-            # print(cluster_pos)
-            # print(phi_matrix)
-            # exit()
         phi_matrix = np.column_stack((np.array(phi_matrix).T,np.ones(data.shape[0])))
-        # print(np.shape(phi_matrix))
         return phi_matrix
 
     def __init__(self, k, gamma):

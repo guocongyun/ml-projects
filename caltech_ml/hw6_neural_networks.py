@@ -105,7 +105,7 @@ class NeuralNetwork:
                             color=color
                         )
         # display(dot) 
-        s = Source(dot,filename="neural_network.gv",format="png")
+        s = Source(dot,filename="outputs/neural_network",format="png")
         s.view()
 
     def backpropagation(self, y):
@@ -130,13 +130,6 @@ class NeuralNetwork:
             for this_ in range(layer.size):
                 self.layers[index].delta[this_] = 0
                 for next_ in range(next_layer.size):
-                    # print("what")
-                    # print(next_)
-                    # print(next_layer.weights[next_][this_])
-                    # print(next_layer.delta)
-                    # print(next_layer.delta[0])
-                    # print((1 - (input_)**2) * next_layer.weights[next_][this_] * next_layer.delta[next_])
-                    # print(self.layers[index].delta[this_])
                     self.layers[index].delta[this_] = (1 - (input_[this_])**2) * next_layer.weights[next_][this_] * next_layer.delta[next_]
 
 
@@ -148,7 +141,6 @@ class NeuralNetwork:
             layer = self.layers[index] # IMPORTANT, list are passed by reference in python not value
             prev_layer = self.layers[index - 1]
             for num in range(len(layer.weights)): # IMPORTANT only use _ in for loop if _ meant to be discarded
-                # print(layer.weights[_])
                 weight = layer.weights[num]
                 input_ = prev_layer.output
                 weight_decay = - 2 * self.learning_rate * weight * self.weight_decay_rate

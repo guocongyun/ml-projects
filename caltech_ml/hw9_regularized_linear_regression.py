@@ -22,13 +22,12 @@ def one_vs_all(digit_a, dataset):
     data_b[:,0] = -1
     data_set = np.vstack((data_a,data_b))
     return data_set
-
 # one_vs_all(1)
 
 #%%
-# data_train = np.loadtxt("features.train")
-# data_test = np.loadtxt("features.test")
-# clf = linear_model.RidgeClassifier(alpha=1)
+data_train = np.loadtxt("./data/svm.train")
+data_test = np.loadtxt("./data/svm.test")
+clf = linear_model.RidgeClassifier(alpha=1)
 
 def train_test (train_data_set, test_data_set, transform = None):
     if transform != None: train_data_set = transform(train_data_set)

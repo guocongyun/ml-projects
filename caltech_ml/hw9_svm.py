@@ -14,7 +14,7 @@ phi = lambda dataset: np.array([
 # IMPORTANT since the transformed parameter is smaller than paramters in 2degree polynomial kernel therefore we found less support vectors
 
 def sb_scatter():
-    data_train = np.loadtxt("custom_set.train")
+    data_train = np.loadtxt("./data/svm2.train")
     data_train = phi(data_train)
     above = (data_train[:,2] > 0) 
     below = (data_train[:,2] < 0) 
@@ -26,7 +26,7 @@ def sb_scatter():
 
 # sb_scatter()
 #%%
-data_train = np.loadtxt("custom_set.train") # svm internally uses libsvm
+data_train = np.loadtxt("./data/svm2.train") # svm internally uses libsvm
 poly_svm = svm.SVC(coef0=1,kernel='poly',degree=2,gamma=1)
 poly_svm.fit(data_train[:,:2],data_train[:,0])
 print(len(poly_svm.support_))

@@ -6,14 +6,14 @@ import numpy as np
 import random
 
 try:
-    with open("in.dta", "x") as f_in:
+    with open("./data/regularization.train", "x") as f_in:
         request_in = requests.get("http://work.caltech.edu/data/in.dta")
         f_in.write(request_in.text)
 except FileExistsError as e:
     print("Training data already downloaded")
 
 try:
-    with open("out.dta","x") as f_out:
+    with open("./data/regularization.test","x") as f_out:
         request_out = requests.get("http://work.caltech.edu/data/out.dta")
         f_out.write(request_out.text)
 except FileExistsError as e:
@@ -61,7 +61,7 @@ class LinearRegression():
         self.weight = None
     
     def training(self, dataset,k): # minimising Error in, Ein
-        dataset.read_data("in.dta")
+        dataset.read_data("./data/regularization.train")
         transpose_X = np.transpose(dataset.X)
         inverse_XTX = np.linalg.pinv(transpose_X @ dataset.X + (10**k) * np.identity(8)) # IMPORTANT, the weight decay depend on value for k
         peusdo_inverse = inverse_XTX @ transpose_X
@@ -72,8 +72,8 @@ class LinearRegression():
     def testing(self, error_total, dataset, insample = True): 
 
         # Generate new data if testing outsample error
-        if (insample): dataset.read_data("in.dta")
-        if (not insample): dataset.read_data("out.dta")
+        if (insample): dataset.read_data("./data/regularization.train")
+        if (not insample): dataset.read_data("./data/regularization.test")
 
         # testing using square error
         # square_error = np.transpose(dataset.X @ self.weight - dataset.Y) @ (dataset.X @ self.weight - dataset.Y) # not really square error
@@ -82,7 +82,7 @@ class LinearRegression():
         # error_total += square_error
 
         # testing using classification error
-        prediction = np.sign(dataset.X @ self.weight) # the position in dot or @ product matters
+        prediction = np.sign(dataset.X @ self.weight) 
         actual_value = np.array(dataset.Y)
         if (not insample): classification_error = sum(prediction != actual_value)/dataset.line_num
         elif(insample): classification_error = (sum(prediction != actual_value))/dataset.line_num
@@ -109,6 +109,5 @@ class LinearRegression():
 # %%
 linear_reg = LinearRegression(
 )
-# print("waht")
 linear_reg.main()
 

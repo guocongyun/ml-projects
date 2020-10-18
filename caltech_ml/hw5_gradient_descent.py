@@ -55,7 +55,7 @@ class GradientDescent:
     def err_func_(self, gradient):
         return (np.transpose(gradient) @ gradient)**(1/2) * self.learning_rate
 
-    def err_func_deriv(self, x = symbols("x"), y = symbols("y")):
+    def err_func_deriv(self, x = symbols("x"), y = symbols("y")): # diff from scipy can be used to solve derivatives
         u, v = symbols("u v")
         derivative = lambda x, y: np.array([float(diff(self.err_func(u,v),u).subs({u:x, v:y})),
                                    float(diff(self.err_func(u,v),v).subs({u:x, v:y}))])
@@ -78,23 +78,15 @@ class GradientDescent:
                 yn = dataset.Y[index]
                 component_gradient = -yn * xn / (1+np.math.exp(yn* (wt @ xn)))
                 weights = weights - component_gradient * self.learning_rate
-                # IMPORTANT weight-=1 modify the data in place, instad of creating a new object
+                # IMPORTANT weight-=1 modify the data in place, instead of creating a new object
                 # hence if old_weights = weights, weights-=1 => old_weights-=1 
             
             total_epoch+=1
             
             if (np.linalg.norm(weights - old_weights) < 0.01): finished = True
 
-        # print(np.linalg.norm(self.learning_rate*component_gradient)) # == ||self.learning_rate*component_gradient|| == (np.transpose(gradient) @ gradient)**(1/2) * self.learning_rate
+        # np.linalg.norm(self.learning_rate*component_gradient) == ||self.learning_rate*component_gradient|| == (np.transpose(gradient) @ gradient)**(1/2) * self.learning_rate
         return weights,total_epoch
-
-        # u = v = float(1.0)
-        # iteration = 0
-        # while(self.err_func(u,v) >= highest_error):
-        #     err = self.err_func_deriv(u, v)
-        #     u -= self.learning_rate*err[0]
-        #     v -= self.learning_rate*err[1]
-        #     iteration +=1
 
     def gradient_descent_(self, iteration_num = 15):
         u = v = float(1.0)
@@ -158,9 +150,7 @@ class LogisticRegression():
 
         print(error_outsample_total/RUNS)
         print(total_epoch/RUNS)
-        
 
-        # return error_insample_total,error_outsample_total, self.weight
 
 if __name__ == "__main__":
     logistic_regression = LogisticRegression()

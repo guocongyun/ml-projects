@@ -8,15 +8,15 @@ import seaborn as sb
 import matplotlib.pyplot as plt
 #%%
 # try:
-#     with open("features.train", "x") as f_in:
-#         request_in = requests.get("http://www.amlbook.com/data/zip/features.train")
+#     with open("svm.train", "x") as f_in:
+#         request_in = requests.get("http://www.amlbook.com/data/zip/svm.train")
 #         f_in.write(request_in.text)
 # except FileExistsError as e:
 #     print("Training data already downloaded")
 
 # try:
-#     with open("features.test","x") as f_out:
-#         request_out = requests.get("http://www.amlbook.com/data/zip/features.test")
+#     with open("svm.test","x") as f_out:
+#         request_out = requests.get("http://www.amlbook.com/data/zip/svm.test")
 #         f_out.write(request_out.text)
 # except FileExistsError as e:
 #     print("Test data already downloaded")
@@ -27,16 +27,17 @@ import matplotlib.pyplot as plt
 # print(train_data_)
 
 # IMPORTANT::
-# with open("features.train") as train_data:
+# with open("svm.train") as train_data:
     # data_train_ = np.array([list(map(float,line.strip().split())) for line in train_data])
+
 def sb_scatter():
-    data_train = np.loadtxt("features.train")
+    data_train = np.loadtxt("./data/svm.train")
     sb.scatterplot(data_train[:,1], data_train[:,2], data_train[:,0])
     plt.show()
 # sb_scatter()
 #%%
 def subplots_():
-    data_train = np.loadtxt("features.train")
+    data_train = np.loadtxt("./data/svm.train")
     get_pos = lambda n: divmod(n, 3)
     fig, ax = plt.subplots(4, 3, figsize=(13,13), sharex=True, sharey=True)
 
@@ -57,7 +58,6 @@ def one_vs_one(digit_a,digit_b, dataset):
     data_b[:,0] = -1
     data_set = np.vstack((data_a,data_b))
     return data_set
-# one_vs_one(1,3)
 #%%
 def one_vs_all(digit_a, dataset):
     data_a = dataset[(dataset[:,0] == digit_a)]
@@ -81,6 +81,7 @@ def one_vs_all(digit_a, dataset):
 #     print(f"num is {a} error is {E_in}")
     
 # print(f"difference in sv num is {sv_num_2-sv_num_1} ")
+
 # IMPORTANT svc.fit resets weight, use partial_fit() to preserve previous stuff
 
 #%%
@@ -92,13 +93,13 @@ c_list = (0.01,1,100,1e4,1,1e6)
 for c_val in c_list:
     # for q_val in (2,5):
     polynomial_svc = svm.SVC(C=c_val, kernel='rbf',gamma=1)
-    data_train = np.loadtxt("features.train")
+    data_train = np.loadtxt("./data/svm.train")
     data_set = one_vs_one(1,5,data_train)
     polynomial_svc.fit(data_set[:,1:],data_set[:,0])
     prediction = polynomial_svc.predict(data_set[:,1:])
     E_in = np.mean(data_set[:,0] != prediction)
     
-    data_test_ = np.loadtxt("features.test")
+    data_test_ = np.loadtxt("./data/svm.test")
     data_test_ = one_vs_one(1,5,data_test_)
     prediction = polynomial_svc.predict(data_test_[:,1:])
     E_out = np.mean(data_test_[:,0] != prediction)
@@ -109,7 +110,7 @@ for c_val in c_list:
 
 # %%
 # c_list = (0.01,1,100,1e4,1,1e6)
-# data_train = np.loadtxt("features.train") # ISSUE: one extra data?
+# data_train = np.loadtxt("svm.train") # ISSUE: one extra data?
 # data_train = one_vs_one(1,5,data_train)
 # E_vali_list = []
 # for c_val in c_list:

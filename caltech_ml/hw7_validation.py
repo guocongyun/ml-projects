@@ -19,11 +19,8 @@ class Dataset:
             self.X, self.Y = [], []
             for line in data_in:
                 line = list(map(float, line.strip().split()))
-                # default value for spliting is any white space
-                # rstrip strip right space, lstrip strip left space, strip does both
                 x = np.array([1, line[0], line[1]])
 
-                # x = self.transformation()
                 y = np.array(line[2])
                 
                 self.X.append(x)
@@ -73,7 +70,7 @@ class LinearRegression_():
         self.linear_reg = None
 
     def training(self, dataset,k): # minimising Error in, Ein
-        dataset.read_data("in.dta")
+        dataset.read_data("./data/regularization.train")
         dataset.split_data(25)
         dataset.X, dataset.X_validation = dataset.X_validation, dataset.X 
         dataset.Y, dataset.Y_validation = dataset.Y_validation, dataset.Y
@@ -83,8 +80,8 @@ class LinearRegression_():
 
     def testing(self, error_total, dataset, k, insample = True): 
 
-        # if (insample): dataset.read_data("in.dta")
-        if (not insample): dataset.read_data("out.dta")
+        # if (insample): dataset.read_data("./data/regularization.input")
+        if (not insample): dataset.read_data("./data/regularization.test")
 
         if (insample): 
             prediction = np.sign(self.linear_reg.predict(dataset.transformation()(k)(dataset.X_validation)))
@@ -101,7 +98,6 @@ class LinearRegression_():
     def main(self):
         dataset_ = Dataset()
         k_range = range(0,8)
-        # print(k_range)
         for k in k_range:
             error_insample_total = 0
             error_outsample_total = 0

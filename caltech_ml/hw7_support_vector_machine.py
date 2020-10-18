@@ -15,7 +15,7 @@ class Dataset:
         split_data = False
         while not split_data:        
             self.X, self.Y  = [], []
-            for _ in range(n): # don't use np append in a loop as it's slow
+            for _ in range(n): 
 
                 x1 , x2 = self.rand_point(2)
                 x = np.array([1, x1, x2])
@@ -82,7 +82,6 @@ class SVM():
             # IMPORTANT: G.shape == n_samples,n_samples
             # h.shape == n_samples,1
             # self.alphas.shape == n_samples,1
-            # print(np.shape(h))
             G = cvxopt.matrix(-np.diag(np.ones(n_samples)))
             h = cvxopt.matrix(np.zeros(n_samples))
         else:
@@ -145,26 +144,27 @@ def plot_contour(function_, dataset, range_=[-1,1]): # IMPORTANT, don't give any
     ZZ = np.zeros(XX.shape)
 
     # 1) creating using matrix multiplications
-    ZZ = function_.predict(np.array([1,XX, YY]),False)
-    print(np.array([1,XX, YY]))
-    print(ZZ)
+    # ZZ = function_.predict(np.array([1,XX, YY]),False)
+    # print(np.array([1,XX, YY]))
+    # print(ZZ)
 
     # 2) creating ZZ list using for loops
     # for row in range(XX.shape[0]): # IMPORTANT, np array.shape[0] ==  len(array), nparray.shape[1] == len(array[0])
     #     for col in range(XX.shape[1]):
     #         x = np.array([[1,XX[row,col], YY[row,col]]])
     #         ZZ[row,col] = function_.predict(x,False)
-            # if np.all(constraints_satisfied(x)):
-            #     constraints[row,col] = 1
+    #         if np.all(constraints_satisfied(x)):
+    #             constraints[row,col] = 1
 
     # 3) creating ZZ list using Xplot new list, 1)==2)==3)
-    # Xplot = np.zeros((Nplot**2, 3))
-    # Xplot[:,0] = 1
-    # Xplot[:,1] = XX.reshape(-1)
-    # Xplot[:,2] = YY.reshape(-1)
-    # yplot = function_.predict(Xplot[:],False)
-    # yplot = np.sign(yplot[:] + function_.bias)
-    # ZZ = yplot.reshape(XX.shape)
+    Xplot = np.zeros((100**2, 3))
+    Xplot[:,0] = 1
+    Xplot[:,1] = XX.reshape(-1)
+    Xplot[:,2] = YY.reshape(-1)
+    yplot = function_.predict(Xplot[:],False)
+    yplot = np.sign(yplot[:] + function_.bias)
+    ZZ = yplot.reshape(XX.shape)
+
     plt.gca().set_aspect(1)
     plt.xlabel("x")
     plt.ylabel("y")
@@ -220,7 +220,3 @@ if __name__ == "__main__":
 
 # IMPORTANT np.reshape(-1) means to reshape array to a unknown dimension
 # i.e. [1,2].reshape(-1,1) => [[1],[2]].shape = (2,1)
-
-
-
-# %%
