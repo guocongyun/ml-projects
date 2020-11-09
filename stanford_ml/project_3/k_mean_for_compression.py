@@ -3,16 +3,13 @@ from matplotlib.image import imread
 import matplotlib.pyplot as plt
 import numpy as np
 
-image_matrix_l = imread('./stanford_ml/prob_3/mandrill-large.tiff')
-image_matrix_s = imread('./stanford_ml/prob_3/mandrill-small.tiff')
+image_matrix_l = imread('../data/project_3/mandrill-large.tiff')
+image_matrix_s = imread('../data/project_3/mandrill-small.tiff')
 
 #%%
-# print(image_matrix_l.shape)
-# print(image_matrix_s.shape)
-# print(image_matrix_s)
 # plt.imshow(image_matrix_l)
 # plt.imshow(image_matrix_s)
-print(image_matrix_s)
+# print(image_matrix_s)
 # plt.show()
 #%%
 # IMPORTANt sklearn kmean expect input to be in the shape of (x,n) where n is the dimension and x is the num of data
@@ -20,7 +17,6 @@ l_shape = image_matrix_l.shape
 s_shape = image_matrix_s.shape
 image_matrix_s = image_matrix_s.reshape(-1,3)
 image_matrix_l = image_matrix_l.reshape(-1,3)
-# print(image_matrix_s.shape)
 #%%
 
 if __name__ == "__main__":
