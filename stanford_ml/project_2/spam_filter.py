@@ -22,7 +22,7 @@ def readMatrix(file):
     return matrix, tokens, np.array(Y)
 
 # trainMatrix, tokenlist, trainCategory = readMatrix('./stanford_ml/prob_2/MATRIX.TRAIN')
-testMatrix, tokenlist, testCategory = readMatrix('./stanford_ml/prob_2/MATRIX.TEST')
+testMatrix, tokenlist, testCategory = readMatrix('../data/project_2/spam_filter.TEST')
 
 # print(trainMatrix.shape)
 # print(trainCategory) # assume 1 is spam
@@ -60,8 +60,6 @@ def evaluate_(matrix, test_matrix, category):
     # state['px_given_ham'] = np.log((np.sum(ham,axis=0) + laplace_smoothing)/(ham_len + 2*laplace_smoothing))
     # state['pspam'] = (spam_len + laplace_smoothing) / (len(category) + 2*laplace_smoothing)
     # spam_token = np.argsort(state['px_given_spam'] - state['px_given_ham'])[-5:]
-    # print(spam_token)
-    # print(np.array(tokenlist)[spam_token])
 
     return output
 
@@ -70,7 +68,7 @@ train_sizes = np.array([50, 100, 200, 400, 800, 1400])
 errors = np.ones(train_sizes.shape)
 for i,train_size in enumerate(train_sizes):
     # trainMatrix, tokenlist, trainCategory = readMatrix('./stanford_ml/prob_2/MATRIX.TRAIN')
-    trainMatrix, tokenlist, trainCategory = readMatrix('./stanford_ml/prob_2/MATRIX.TRAIN.'+str(train_size))
+    trainMatrix, tokenlist, trainCategory = readMatrix('../data/project_2/spam_filter.'+str(train_size))
     output = evaluate_(trainMatrix, testMatrix, trainCategory)
     evaluate(output, testCategory)
 

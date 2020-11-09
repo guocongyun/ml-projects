@@ -62,12 +62,11 @@ def logistic_regression(X, Y):
 
 def main():
     print('==== Training model on data set A ====')
-    Xa, Ya = load_data('./stanford_ml/data_a.txt')
+    Xa, Ya = load_data('../data/project_2/debug_ml_a.txt')
     logistic_regression(Xa, Ya)
 
     print('\n==== Training model on data set B ====')
-    Xb, Yb = load_data('./stanford_ml/data_b.txt')
-    # logistic_regression(Xb, Yb)
+    Xb, Yb = load_data('../data/project_2/debug_ml_b.txt')
 
 
     return
